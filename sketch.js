@@ -1,7 +1,7 @@
 //VARIABLES ---------------------------
 let table;
-// the amount of lines being drawn based on the rows in the dataset
-let step = 100;
+// the amount of lines being drawn based on the rows in the dataset (dataset has 4163 rows)
+let step = 50;
 // set of road types
 let roadTypes = new Set();
 
@@ -75,8 +75,10 @@ function drawRoads() {
     // define random X and Y control positions, but constrain them to the canvas size. 
     let controlStartX = constrain(random(width), 0, width);
     let controlStartY = constrain(random(height), 0, height);
-    let controlEndX = constrain(random(width), 0, width);
-    let controlEndY = constrain(random(height), 0, height);
+    // changed from random to noise
+    let controlEndX = constrain(noise(width), 0, width);
+    // changed from random to noise
+    let controlEndY = constrain(noise(height), 0, height);
 
 
     let roadClass = table.getString(i, 'road_class');
@@ -84,35 +86,49 @@ function drawRoads() {
 
     // default line width
     let lineWidth = 1;
+    let lineColour;
 
     // Set line width based on road class
     switch (roadClass) {
       case 'Strata':
-        lineWidth = 2;
+        lineWidth = 1;
+         // orange
+         lineColour = '#DF6D26'; 
         break;
       case 'Local':
         lineWidth = 4;
+        // blue
+        lineColour = '#005EDF';
         break;
       case 'Collector':
-        lineWidth = 6;
+        lineWidth = 8;
+        // yellow
+        lineColour = '#F8BC50';
         break;
       case 'Minor Arterial':
-        lineWidth = 8;
+        lineWidth = 10;
+        // green
+        lineColour = '#2E4C46';
         break;
       case 'Major Arterial':
-        lineWidth = 10;
+        lineWidth = 16;
+        // purple
+        lineColour = '#554C9E';
         break;
       case 'Major Arterial (Multilane)':
-        lineWidth = 12;
+        lineWidth = 20;
+         // pink
+         lineColour = '#DA5363'; 
         break;
       case 'Highway':
-        lineWidth = 14;
+        lineWidth = 30;
+        lineColour = '#0AA3AF';
         break;
     }
 
     // Set the stroke weight
     strokeWeight(lineWidth);
-    stroke(0);
+    stroke(lineColour);
     noFill();
 
     // create the end point based on the roadlength in the table
