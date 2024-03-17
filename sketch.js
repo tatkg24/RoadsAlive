@@ -1,11 +1,12 @@
-//VARIABLES ---------------------------
+//VARIABLES -----------------------------------------------------------------------------------------------
 let table;
 // the amount of lines being drawn based on the rows in the dataset (dataset has 4163 rows)
-let step = 50;
-// set of road types
-let roadTypes = new Set();
+let step = 100;
+// empty array to store objects of type road
+let roads = [];
 
 
+//SETUP + MAIN --------------------------------------------------------------------------------------------
 // for loading big stuff.
 function preload(){
   // create a table object to store the road data
@@ -16,41 +17,22 @@ function preload(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noLoop();
-  getRoadClasses();
 }
 
 // The "main" method.
 function draw() {
   background(255); // Clear the background
   drawRoads();
+  
+}
+
+// ensures that the sketch changes when browser width changes
+function windowResized() {
+  background(255);
+  resizeCanvas(windowWidth, windowHeight);
 }
 
 // FUNCTIONS ---------------------------------------------------------------------------------------------
-
-// function to get the class names of varios roads in the data file. 
-function getRoadClasses(){
-  
-  // Iterate over the rows of the CSV file
-    for (let i = 0; i < table.getRowCount(); i++) {
-        // Get the road class from the 'road_class' column
-        let roadClass = table.getString(i, 'road_class');
-        // Add the road class to the Set
-        roadTypes.add(roadClass);
-    }
-  
-    // Convert the Set to an array
-    let roadTypesArray = Array.from(roadTypes);
-    // Log the unique road types
-    console.log(roadTypesArray);
-      
-    /*
-    The contents of the Array:
-    ---------------------------------
-    ["Local", "Collector", Minor Arterial, Major Aterial, Major Arterial (Multilane), "Highway", "SEE TMP", "Strata", ""]
-    (ignore indexes 6 and 8)
-    */
-}
-
 // gets the maximum road length from the table
 function getRoadLength(){
   let maxRoadLength = 0;
@@ -63,88 +45,49 @@ function getRoadLength(){
   return maxRoadLength;
 }
 
-
+// function to store and draw roads based on the table data
 function drawRoads() {
   let maxRoadLength = getRoadLength();
+  let randStep = floor(random(100, 300));
+  
 
-  for (let i = 0; i < table.getRowCount(); i+=step) {
-    // define random X and Y start positions, but constrain them to the canvas size. 
+  for (let i = floor(random(0, 300)); i < table.getRowCount(); i += randStep) {
     let startX = constrain(random(width), 0, width);
     let startY = constrain(random(height), 0, height);
 
-    // define random X and Y control positions, but constrain them to the canvas size. 
     let controlStartX = constrain(random(width), 0, width);
     let controlStartY = constrain(random(height), 0, height);
-    // changed from random to noise
-    let controlEndX = constrain(noise(width), 0, width);
-    // changed from random to noise
-    let controlEndY = constrain(noise(height), 0, height);
-
+    let controlEndX = constrain(random(width), 0, width);
+    let controlEndY = constrain(random(height), 0, height);
 
     let roadClass = table.getString(i, 'road_class');
     let roadLength = table.getNum(i, 'SHAPESTLength');
+    let landUse = table.getString(i, 'land_use');
+    // if the landuse is null indicate this.
+      if(landUse === ''){
+        landUse = "Not Specified";
+      }
+    let roadName = table.getString(i, 'roadmst_name');
 
-    // default line width
-    let lineWidth = 1;
-    let lineColour;
-
-    // Set line width based on road class
-    switch (roadClass) {
-      case 'Strata':
-        lineWidth = 1;
-         // orange
-         lineColour = '#DF6D26'; 
-        break;
-      case 'Local':
-        lineWidth = 4;
-        // blue
-        lineColour = '#005EDF';
-        break;
-      case 'Collector':
-        lineWidth = 8;
-        // yellow
-        lineColour = '#F8BC50';
-        break;
-      case 'Minor Arterial':
-        lineWidth = 10;
-        // green
-        lineColour = '#2E4C46';
-        break;
-      case 'Major Arterial':
-        lineWidth = 16;
-        // purple
-        lineColour = '#554C9E';
-        break;
-      case 'Major Arterial (Multilane)':
-        lineWidth = 20;
-         // pink
-         lineColour = '#DA5363'; 
-        break;
-      case 'Highway':
-        lineWidth = 30;
-        lineColour = '#0AA3AF';
-        break;
-    }
-
-    // Set the stroke weight
-    strokeWeight(lineWidth);
-    stroke(lineColour);
-    noFill();
-
-    // create the end point based on the roadlength in the table
-    // set the x and y to be the same and constrain to the canvas size
     let endX = constrain(map(roadLength, 0, maxRoadLength, 0, width), 0, width);
-    let endY = endX;
+    let endY = constrain(map(roadLength, 0, maxRoadLength, 0, height), 0, height);
 
-    // create the curve based on the above information
-    curve(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY);
-
+    // Create a new Road object and add it to the roads array
+    let road = new Road(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadClass, roadLength, landUse, roadName);
+    roads.push(road);
   }
+
+  // Draw all roads using the drawRoad() function inside of the road.js class
+  roads.forEach(road => {
+    road.drawRoad();
+  });
+
 }
 
-// ensures that the sketch changes when browser width changes
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+function mouseClicked() {
+  // Iterate over each road object and check for mouse over
+  roads.forEach(road => {
+    road.mouseClicked();
+  });
 }
-
 
