@@ -21,53 +21,55 @@ class Road {
         this.popupShown = false;
     }
 
-    drawRoad() {
-        // init variables to store the width and colour of the lines (roads)
-        let lineWidth;
-        let lineColour;
+ drawRoad() {
+    // init variables to store the width and colour of the lines (roads)
+    let lineWidth;
+    let lineColour;
 
-        switch (this.roadClass) {
-            case 'Strata':
-                lineWidth = 1;
-                lineColour = color(223, 109, 38); // RGB values for #DF6D26
-                break;
-            case 'Local':
-                lineWidth = 4;
-                lineColour = color(0, 94, 223); // RGB values for #005EDF
-                break;
-            case 'Collector':
-                lineWidth = 8;
-                lineColour = color(248, 188, 80); // RGB values for #F8BC50
-                break;
-            case 'Minor Arterial':
-                lineWidth = 10;
-                lineColour = color(46, 76, 70); // RGB values for #2E4C46
-                break;
-            case 'Major Arterial':
-                lineWidth = 16;
-                lineColour = color(85, 76, 158); // RGB values for #554C9E
-                break;
-            case 'Major Arterial (Multilane)':
-                lineWidth = 20;
-                lineColour = color(218, 83, 99); // RGB values for #DA5363
-                break;
-            case 'Highway':
-                lineWidth = 30;
-                lineColour = color(10, 163, 175); // RGB values for #0AA3AF
-                break;
-        }
-        
-        
-
-        // set the strokeweight and stroke colour based on the switch statement
-        strokeWeight(lineWidth);
-        stroke(lineColour);
-        noFill();
-
-        // draw the curve based on the above information
-        curve(this.startX, this.startY, this.controlStartX, this.controlStartY, this.controlEndX, this.controlEndY, this.endX, this.endY);
+    switch (this.roadClass) {
+        case 'Strata':
+            lineWidth = 1;
+            lineColour = color('#DF6D26'); // Hexadecimal representation of the color
+            break;
+        case 'Local':
+            lineWidth = 4;
+            lineColour = color('#005EDF'); // Hexadecimal representation of the color
+            break;
+        case 'Collector':
+            lineWidth = 8;
+            lineColour = color('#F8BC50'); // Hexadecimal representation of the color
+            break;
+        case 'Minor Arterial':
+            lineWidth = 10;
+            lineColour = color('#2E4C46'); // Hexadecimal representation of the color
+            break;
+        case 'Major Arterial':
+            lineWidth = 16;
+            lineColour = color('#554C9E'); // Hexadecimal representation of the color
+            break;
+        case 'Major Arterial (Multilane)':
+            lineWidth = 20;
+            lineColour = color('#DA5363'); // Hexadecimal representation of the color
+            break;
+        case 'Highway':
+            lineWidth = 30;
+            lineColour = color('#0AA3AF'); // Hexadecimal representation of the color
+            break;
+        default:
+            lineWidth = 1;
+            lineColour = color(0); // Default to black if road class is not recognized
+            break;
     }
-    
+
+    // set the strokeweight and stroke colour based on the switch statement
+    strokeWeight(lineWidth);
+    stroke(lineColour);
+    noFill();
+
+    // draw the curve based on the above information
+    curve(this.startX, this.startY, this.controlStartX, this.controlStartY, this.controlEndX, this.controlEndY, this.endX, this.endY);
+}
+
     mouseClicked() {
         // Calculate a point along the curve that is closer to the mouse position
         let closestPoint = this.findClosestPointOnCurve(mouseX, mouseY);

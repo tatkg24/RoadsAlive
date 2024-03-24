@@ -23,7 +23,6 @@ function setup() {
 function draw() {
   background(255); // Clear the background
   drawRoads();
-  
 }
 
 // ensures that the sketch changes when browser width changes
@@ -47,6 +46,7 @@ function getRoadLength(){
 
 // function to store and draw roads based on the table data
 function drawRoads() {
+  roads = [];
   let maxRoadLength = getRoadLength();
   let randStep = floor(random(100, 300));
   
@@ -90,4 +90,3 @@ function mouseClicked() {
     road.mouseClicked();
   });
 }
-
