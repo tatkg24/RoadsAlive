@@ -21,13 +21,16 @@ class BaseRoad {
 
    // controls the animation pacing
     update(isDay) {
+        let newSpeed = 0;
         // Adjust the speed based on whether it's day or night
+        if(isDay){
+            newSpeed = this.speed;
+        }else{
+            console.log(this.speed);
+            newSpeed = this.speed/10;
+        }
 
-        console.log(this.speed);
-
-        let adjustedSpeed = isDay ? this.speed : this.speed / 10;
-
-        this.t += adjustedSpeed;
+        this.t += newSpeed;
 
         // if t exceeds 1, reset it to 0 to restart the animation
         if (this.t > 1) {

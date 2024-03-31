@@ -2,8 +2,9 @@ let table;
 let step = 100;
 let randStep;
 let roads = [];
-let isDay = true; // Flag to indicate if it's day or night
 let trafficSlider; // Slider for controlling traffic density
+let isDay;
+
 
 function preload(){
     table = loadTable('data/Road.csv', 'csv', 'header');
@@ -17,14 +18,15 @@ function setup() {
 }
 
 function draw() {
-  let isDay = trafficSlider.value() >= 50; // Assuming the slider ranges from 0 to 100
+  console.log(isDay);
 
-  if (isDay) {
-      background(255, 255, 204); // Yellow background during the day
-  } else {
-      background(0, 0, 128); // Navy background at night
+  if(trafficSlider.value() >= 50){
+    isDay = true;
+    background(255, 255, 204); // Yellow background during the day
+  }else if(trafficSlider.value()<50){
+    isDay = false;
+    background(0, 0, 128); // Navy background at night
   }
-
   for (let i = 0; i < roads.length; i++) {
       roads[i].update(isDay); // Update the animation state
       roads[i].drawRoad(); // Draw the road curve
