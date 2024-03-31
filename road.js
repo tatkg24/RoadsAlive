@@ -1,6 +1,6 @@
-// Define a class for roads
-class Road {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadClass, roadLength, landUse, roadName) {
+// Define a base class for roads----------------------------------------------------------------------------
+class BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
         // info for drawing the curve
         this.startX = startX;
         this.startY = startY;
@@ -12,63 +12,46 @@ class Road {
         this.endY = endY;
 
         // information about the road
-        this.roadClass = roadClass; 
         this.roadLength = roadLength;
         this.landUse = landUse;
         this.roadName = roadName;
 
         // flag to track if popup has been shown
         this.popupShown = false;
+        this.t = 0; //time variable for the animation
+        this.speed = speed; //speed variable for the animation
+        this.amp = amp;
+
     }
 
- drawRoad() {
-    // init variables to store the width and colour of the lines (roads)
-    let lineWidth;
-    let lineColour;
+    // controls the animation pacing
+    update() {
+        this.t += this.speed;
 
-    switch (this.roadClass) {
-        case 'Strata':
-            lineWidth = 1;
-            lineColour = color('#DF6D26'); // Hexadecimal representation of the color
-            break;
-        case 'Local':
-            lineWidth = 4;
-            lineColour = color('#005EDF'); // Hexadecimal representation of the color
-            break;
-        case 'Collector':
-            lineWidth = 8;
-            lineColour = color('#F8BC50'); // Hexadecimal representation of the color
-            break;
-        case 'Minor Arterial':
-            lineWidth = 10;
-            lineColour = color('#2E4C46'); // Hexadecimal representation of the color
-            break;
-        case 'Major Arterial':
-            lineWidth = 16;
-            lineColour = color('#554C9E'); // Hexadecimal representation of the color
-            break;
-        case 'Major Arterial (Multilane)':
-            lineWidth = 20;
-            lineColour = color('#DA5363'); // Hexadecimal representation of the color
-            break;
-        case 'Highway':
-            lineWidth = 30;
-            lineColour = color('#0AA3AF'); // Hexadecimal representation of the color
-            break;
-        default:
-            lineWidth = 1;
-            lineColour = color(0); // Default to black if road class is not recognized
-            break;
+        // if t exceeds 1, reset it to 0 to restart the animation
+        if (this.t > 1) {
+          this.t = 0;
+        }
+      }
+
+    // draws the roads with the specified width and colour
+    drawRoad(lineWidth, lineColour) {
+        // set the strokeweight and stroke colour based on the switch statement
+        strokeWeight(lineWidth);
+        stroke(lineColour);
+        noFill();
+    
+        beginShape();
+        for (let t = 0; t <= 1; t += 0.01) {
+            let currentX = lerp(this.startX, this.endX, t);
+            let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.amp; // Adjust the amplitude (10 in this case) and speed (0.1 in this case) as needed
+    
+            curveVertex(currentX, currentY);
+        }
+        endShape();
     }
-
-    // set the strokeweight and stroke colour based on the switch statement
-    strokeWeight(lineWidth);
-    stroke(lineColour);
-    noFill();
-
-    // draw the curve based on the above information
-    curve(this.startX, this.startY, this.controlStartX, this.controlStartY, this.controlEndX, this.controlEndY, this.endX, this.endY);
-}
+    
+    
 
     mouseClicked() {
         // Calculate a point along the curve that is closer to the mouse position
@@ -86,7 +69,7 @@ class Road {
 
             // Set the content of the popup
             this.popup.html('<b><u>About ' + this.roadName + ':</u></b><br>' +
-                '<b>Road Class: </b>' + this.roadClass + '<br>' +
+                '<b>Road Class: </b>' + this.constructor.name + '<br>' +
                 '<b>Road Name: </b>' + this.roadName + '<br>' +
                 '<b>Road Length: </b>' + this.roadLength + '<br>' +
                 '<b>Land Use: </b>' + this.landUse);
@@ -107,8 +90,7 @@ class Road {
             }, 20); // 20 milliseconds interval for smoother animation
             this.popupShown = true; // Mark the popup as shown
         }
-    } 
-    
+    }
 
     findClosestPointOnCurve(x, y) {
         let closestDist = Infinity;
@@ -123,5 +105,78 @@ class Road {
             }
         }
         return closestPoint;
+    }
+}
+
+// Define subclasses for each road class----------------------------------------------------------------
+
+class StrataRoad extends BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    }
+
+    drawRoad() {
+        // draw road takes two params (line width and colour)
+        super.drawRoad(1, color(223, 109, 38)); // Orange color
+    }
+}
+
+class LocalRoad extends BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    }
+
+    drawRoad() {
+        super.drawRoad(4, color(0, 94, 223)); // Blue color
+    }
+}
+
+class CollectorRoad extends BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    }
+
+    drawRoad() {
+        super.drawRoad(8, color(248, 188, 80)); // Yellow color
+    }
+}
+
+class MinorArterialRoad extends BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    }
+
+    drawRoad() {
+        super.drawRoad(10, color(46, 76, 70)); // Dark green color
+    }
+}
+
+class MajorArterialRoad extends BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    }
+
+    drawRoad() {
+        super.drawRoad(16, color(85, 76, 158)); // Purple color
+    }
+}
+
+class MajorArterialMultilaneRoad extends BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    }
+
+    drawRoad() {
+        super.drawRoad(20, color(218, 83, 99)); // Red color
+    }
+}
+
+class HighwayRoad extends BaseRoad {
+    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName,speed, amp);
+    }
+
+    drawRoad() {
+        super.drawRoad(30, color(10, 163, 175)); // Cyan color
     }
 }

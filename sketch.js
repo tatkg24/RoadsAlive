@@ -2,6 +2,7 @@
 let table;
 // the amount of lines being drawn based on the rows in the dataset (dataset has 4163 rows)
 let step = 100;
+let randStep; // Define randStep as a global variable
 // empty array to store objects of type road
 let roads = [];
 
@@ -16,14 +17,19 @@ function preload(){
 // for the setup.
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  noLoop();
+  drawRoads();
 }
 
 // The "main" method.
 function draw() {
   background(255); // Clear the background
-  drawRoads();
+  // Update and draw all roads
+  for (let i = 0; i < roads.length; i++) {
+    roads[i].update(); // Update the animation state
+    roads[i].drawRoad(); // Draw the road curve
+  }
 }
+
 
 // ensures that the sketch changes when browser width changes
 function windowResized() {
@@ -48,8 +54,7 @@ function getRoadLength(){
 function drawRoads() {
   roads = [];
   let maxRoadLength = getRoadLength();
-  let randStep = floor(random(100, 300));
-  
+  randStep = floor(random(100, 300)); // Define randStep here
 
   for (let i = floor(random(0, 300)); i < table.getRowCount(); i += randStep) {
     let startX = constrain(random(width), 0, width);
@@ -72,16 +77,38 @@ function drawRoads() {
     let endX = constrain(map(roadLength, 0, maxRoadLength, 0, width), 0, width);
     let endY = constrain(map(roadLength, 0, maxRoadLength, 0, height), 0, height);
 
-    // Create a new Road object and add it to the roads array
-    let road = new Road(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadClass, roadLength, landUse, roadName);
+    let road;
+
+    // Create a new Road object based on road class
+    switch (roadClass) {
+      case 'Strata':
+        road = new StrataRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, 0.001, 10);
+        break;
+      case 'Local':
+        road = new LocalRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, 0.005, 10);
+        break;
+      case 'Collector':
+        road = new CollectorRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, 0.009, 20);
+        break;
+      case 'Minor Arterial':
+        road = new MinorArterialRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, 0.02, 20);
+        break;
+      case 'Major Arterial':
+        road = new MajorArterialRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, 0.09, 10);
+        break;
+      case 'Major Arterial (Multilane)':
+        road = new MajorArterialMultilaneRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, 0.1, 20);
+        break;
+      case 'Highway':
+        road = new HighwayRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, 0.2, 30);
+        break;
+      default:
+        road = new BaseRoad(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadClass, roadLength, landUse, roadName, 0, 10);
+        break;
+    }
+
     roads.push(road);
   }
-
-  // Draw all roads using the drawRoad() function inside of the road.js class
-  roads.forEach(road => {
-    road.drawRoad();
-  });
-
 }
 
 function mouseClicked() {
