@@ -1,13 +1,9 @@
 // Define a base class for roads----------------------------------------------------------------------------
 class BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
         // info for drawing the curve
         this.startX = startX;
         this.startY = startY;
-        this.controlStartX = controlStartX;
-        this.controlStartY = controlStartY;
-        this.controlEndX = controlEndX;
-        this.controlEndY = controlEndY;
         this.endX = endX;
         this.endY = endY;
 
@@ -21,22 +17,27 @@ class BaseRoad {
         this.t = 0; //time variable for the animation
         this.speed = speed; //speed variable for the animation
         this.amp = amp;
-
     }
 
-    // controls the animation pacing
-    update() {
-        this.t += this.speed;
+   // controls the animation pacing
+    update(isDay) {
+        // Adjust the speed based on whether it's day or night
+
+        console.log(this.speed);
+
+        let adjustedSpeed = isDay ? this.speed : this.speed / 10;
+
+        this.t += adjustedSpeed;
 
         // if t exceeds 1, reset it to 0 to restart the animation
         if (this.t > 1) {
-          this.t = 0;
+            this.t = 0;
         }
-      }
+    }
+
 
     // draws the roads with the specified width and colour
     drawRoad(lineWidth, lineColour) {
-        // set the strokeweight and stroke colour based on the switch statement
         strokeWeight(lineWidth);
         stroke(lineColour);
         noFill();
@@ -96,23 +97,24 @@ class BaseRoad {
         let closestDist = Infinity;
         let closestPoint;
         for (let t = 0; t <= 1; t += 0.01) {
-            let px = curvePoint(this.startX, this.controlStartX, this.controlEndX, this.endX, t);
-            let py = curvePoint(this.startY, this.controlStartY, this.controlEndY, this.endY, t);
-            let d = dist(px, py, x, y);
+            let currentX = lerp(this.startX, this.endX, t);
+            let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.amp;
+            let d = dist(currentX, currentY, x, y);
             if (d < closestDist) {
                 closestDist = d;
-                closestPoint = { x: px, y: py, dist: d };
+                closestPoint = { x: currentX, y: currentY, dist: d, t: t };
             }
         }
         return closestPoint;
     }
+    
 }
 
 // Define subclasses for each road class----------------------------------------------------------------
 
 class StrataRoad extends BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
     }
 
     drawRoad() {
@@ -122,8 +124,8 @@ class StrataRoad extends BaseRoad {
 }
 
 class LocalRoad extends BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
     }
 
     drawRoad() {
@@ -132,8 +134,8 @@ class LocalRoad extends BaseRoad {
 }
 
 class CollectorRoad extends BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
     }
 
     drawRoad() {
@@ -142,8 +144,8 @@ class CollectorRoad extends BaseRoad {
 }
 
 class MinorArterialRoad extends BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
     }
 
     drawRoad() {
@@ -152,8 +154,8 @@ class MinorArterialRoad extends BaseRoad {
 }
 
 class MajorArterialRoad extends BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
     }
 
     drawRoad() {
@@ -162,8 +164,8 @@ class MajorArterialRoad extends BaseRoad {
 }
 
 class MajorArterialMultilaneRoad extends BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
     }
 
     drawRoad() {
@@ -172,8 +174,8 @@ class MajorArterialMultilaneRoad extends BaseRoad {
 }
 
 class HighwayRoad extends BaseRoad {
-    constructor(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, controlStartX, controlStartY, controlEndX, controlEndY, endX, endY, roadLength, landUse, roadName,speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
     }
 
     drawRoad() {
