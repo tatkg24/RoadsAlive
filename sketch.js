@@ -11,34 +11,52 @@ function preload(){
 }
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
-    trafficSlider = createSlider(0, 100, 50); // Traffic slider ranges from 0 to 100
-    trafficSlider.position(10, 10); // Position the slider
-    drawRoads();
+  createCanvas(windowWidth, windowHeight);
+  trafficSlider = createSlider(0, 100, 50); // Traffic slider ranges from 0 to 100
+  positionElements(); // Position elements based on window size
+  drawRoads();
 }
 
 function draw() {
-  console.log(isDay);
+  // Check if the slider value is greater than or equal to 50
+  if (trafficSlider && trafficSlider.value() >= 50) {
+      isDay = true;
+      background(255, 255, 255); // white background during the day
+  } else if (trafficSlider && trafficSlider.value() < 50) {
+      isDay = false;
+      background(0, 0, 0); // black background at night
+  }
 
-  if(trafficSlider.value() >= 50){
-    isDay = true;
-    background(255, 255, 204); // Yellow background during the day
-  }else if(trafficSlider.value()<50){
-    isDay = false;
-    background(0, 0, 128); // Navy background at night
-  }
-  for (let i = 0; i < roads.length; i++) {
-      roads[i].update(isDay); // Update the animation state
-      roads[i].drawRoad(); // Draw the road curve
-  }
+  // Check if roads array is not empty before updating or drawing
+  
+      for (let i = 0; i < roads.length; i++) {
+        if(roads[i] != null){
+          roads[i].update(isDay); // Update the animation state
+          roads[i].drawRoad(); // Draw the road curve
+        }
+      }
 
   drawLegend(); // Draw the legend
 }
 
-
 function windowResized() {
-    background(255);
-    resizeCanvas(windowWidth, windowHeight);
+  resizeCanvas(windowWidth, windowHeight);
+  positionElements(); // Reposition elements based on new window size
+  drawRoads(); // Ensure roads are redrawn after window resize
+}
+
+
+function positionElements() {
+  // Position the slider
+  let sliderX = 10; // X position of the slider
+  let sliderY = 10; // Y position of the slider
+  trafficSlider.position(sliderX, sliderY);
+
+  // Position the legend
+  let legendX = windowWidth - 210; // X position of the legend
+  let legendY = 10; // Y position of the legend
+  // Call drawLegend with updated position
+  drawLegend(legendX, legendY);
 }
 
 function getRoadLength(){

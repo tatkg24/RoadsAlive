@@ -16,21 +16,26 @@ class BaseRoad {
         this.popupShown = false;
         this.t = 0; //time variable for the animation
         this.speed = speed; //speed variable for the animation
-        this.amp = amp;
+        this.defaultAmp = amp;
+        this.currentAmp = amp;
     }
 
    // controls the animation pacing
-    update(isDay) {
+   update(isDay) {
         let newSpeed = 0;
+        let newAmp = this.currentAmp;
         // Adjust the speed based on whether it's day or night
         if(isDay){
             newSpeed = this.speed;
+            newAmp = this.defaultAmp+0.5;
         }else{
             console.log(this.speed);
             newSpeed = this.speed/10;
+            newAmp = this.defaultAmp/8; // use default amplitude
         }
 
         this.t += newSpeed;
+        this.currentAmp = newAmp;
 
         // if t exceeds 1, reset it to 0 to restart the animation
         if (this.t > 1) {
@@ -48,7 +53,7 @@ class BaseRoad {
         beginShape();
         for (let t = 0; t <= 1; t += 0.01) {
             let currentX = lerp(this.startX, this.endX, t);
-            let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.amp; // Adjust the amplitude (10 in this case) and speed (0.1 in this case) as needed
+            let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.currentAmp; // Adjust the amplitude (10 in this case) and speed (0.1 in this case) as needed
     
             curveVertex(currentX, currentY);
         }
@@ -101,7 +106,7 @@ class BaseRoad {
         let closestPoint;
         for (let t = 0; t <= 1; t += 0.01) {
             let currentX = lerp(this.startX, this.endX, t);
-            let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.amp;
+            let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.currentAmp;
             let d = dist(currentX, currentY, x, y);
             if (d < closestDist) {
                 closestDist = d;
