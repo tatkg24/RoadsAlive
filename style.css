@@ -6,3 +6,22 @@ html, body {
 canvas {
   display: block;
 }
+
+#day-night-slider{
+  width: 175px;
+  background-color: #DF6D26;
+  border-radius: 5px;
+  outline: none;
+  appearance: none;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+#day-night-slider::-webkit-slider-thumb{
+  width: 15px;
+  height: 15px;
+  background: #0AA3AF;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+

@@ -1,6 +1,6 @@
 // Define a base class for roads----------------------------------------------------------------------------
 class BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
         // info for drawing the curve
         this.startX = startX;
         this.startY = startY;
@@ -11,6 +11,7 @@ class BaseRoad {
         this.roadLength = roadLength;
         this.landUse = landUse;
         this.roadName = roadName;
+        this.direction = direction;
 
         // flag to track if popup has been shown
         this.popupShown = false;
@@ -50,16 +51,26 @@ class BaseRoad {
         stroke(lineColour);
         noFill();
     
+        push(); // Save the current drawing state
+        if (this.direction === "NS") {
+            translate(this.startX, this.startY); // Translate to the start of the road
+            rotate(HALF_PI); // Rotate 90 degrees for North-South direction
+        } else if (this.direction === "EW") {
+            translate(this.startX, this.startY); // Translate to the start of the road
+            // No rotation needed for East-West direction
+        }
+    
         beginShape();
         for (let t = 0; t <= 1; t += 0.01) {
-            let currentX = lerp(this.startX, this.endX, t);
-            let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.currentAmp; // Adjust the amplitude (10 in this case) and speed (0.1 in this case) as needed
+            let currentX = lerp(0, this.endX - this.startX, t); // Adjust for translation
+            let currentY = sin((currentX + frameCount) * this.speed) * this.currentAmp; // Adjust for translation
     
             curveVertex(currentX, currentY);
         }
         endShape();
-    }
     
+        pop(); // Restore the original drawing state
+    }
     
 
     mouseClicked() {
@@ -71,17 +82,23 @@ class BaseRoad {
             // Create a div element for the popup
             this.popup = createDiv();
             this.popup.position(closestPoint.x, closestPoint.y);
-            this.popup.style('background-color', 'black');
             this.popup.style('padding', '10px');
             this.popup.style('font-family', 'Arial');
-            this.popup.style('color', 'white');
-
+            if(isDay == true){
+                this.popup.style('background-color', 'black');
+                this.popup.style('color', 'white');
+            }else{
+                this.popup.style('background-color', 'white');
+                this.popup.style('color', 'black');
+            }
+            
             // Set the content of the popup
             this.popup.html('<b><u>About ' + this.roadName + ':</u></b><br>' +
                 '<b>Road Class: </b>' + this.constructor.name + '<br>' +
                 '<b>Road Name: </b>' + this.roadName + '<br>' +
                 '<b>Road Length: </b>' + this.roadLength + '<br>' +
-                '<b>Land Use: </b>' + this.landUse);
+                '<b>Land Use: </b>' + this.landUse + '<br>' +
+                '<b>Direction: </b>' + this.direction);
 
             // Set initial opacity to 1 (fully visible)
             this.popup.style('opacity', '1');
@@ -107,6 +124,12 @@ class BaseRoad {
         for (let t = 0; t <= 1; t += 0.01) {
             let currentX = lerp(this.startX, this.endX, t);
             let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.currentAmp;
+    
+            if (this.direction === 'NS') {
+                currentY = lerp(this.startY, this.endY, t);
+                currentX = this.startX + sin((currentY + frameCount) * this.speed) * this.currentAmp;
+            }
+    
             let d = dist(currentX, currentY, x, y);
             if (d < closestDist) {
                 closestDist = d;
@@ -116,13 +139,16 @@ class BaseRoad {
         return closestPoint;
     }
     
+    
+    
+    
 }
 
 // Define subclasses for each road class----------------------------------------------------------------
 
 class StrataRoad extends BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp);
     }
 
     drawRoad() {
@@ -132,8 +158,8 @@ class StrataRoad extends BaseRoad {
 }
 
 class LocalRoad extends BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp);
     }
 
     drawRoad() {
@@ -142,8 +168,8 @@ class LocalRoad extends BaseRoad {
 }
 
 class CollectorRoad extends BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp);
     }
 
     drawRoad() {
@@ -152,8 +178,8 @@ class CollectorRoad extends BaseRoad {
 }
 
 class MinorArterialRoad extends BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp);
     }
 
     drawRoad() {
@@ -162,8 +188,8 @@ class MinorArterialRoad extends BaseRoad {
 }
 
 class MajorArterialRoad extends BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp);
     }
 
     drawRoad() {
@@ -172,8 +198,8 @@ class MajorArterialRoad extends BaseRoad {
 }
 
 class MajorArterialMultilaneRoad extends BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp);
     }
 
     drawRoad() {
@@ -182,8 +208,8 @@ class MajorArterialMultilaneRoad extends BaseRoad {
 }
 
 class HighwayRoad extends BaseRoad {
-    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp) {
-        super(startX, startY, endY, endX, roadLength, landUse, roadName, speed, amp);
+    constructor(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp) {
+        super(startX, startY, endY, endX, roadLength, landUse, roadName, direction, speed, amp);
     }
 
     drawRoad() {

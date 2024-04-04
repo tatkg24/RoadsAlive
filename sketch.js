@@ -13,6 +13,7 @@ function preload(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
   trafficSlider = createSlider(0, 100, 50); // Traffic slider ranges from 0 to 100
+  trafficSlider.id('day-night-slider');
   positionElements(); // Position elements based on window size
   drawRoads();
 }
@@ -83,6 +84,7 @@ function drawRoads() {
     let roadClass = table.getString(i, 'road_class');
     let roadLength = table.getNum(i, 'SHAPESTLength');
     let landUse = table.getString(i, 'land_use');
+    let direction = table.getString(i, 'directional_tendency');
     // if the landuse is null indicate this.
       if(landUse === ''){
         landUse = "Not Specified";
@@ -97,25 +99,25 @@ function drawRoads() {
     // Create a new Road object based on road class
     switch (roadClass) {
       case 'Strata':
-        road = new StrataRoad(startX, startY, endY, endX, roadLength, landUse, roadName, 0.001, 10);
+        road = new StrataRoad(startX, startY, endY, endX, roadLength, landUse, roadName, direction, 0.001, 10);
         break;
       case 'Local':
-        road = new LocalRoad(startX, startY, endY, endX, roadLength, landUse, roadName, 0.005, 10);
+        road = new LocalRoad(startX, startY, endY, endX, roadLength, landUse, roadName, direction, 0.005, 10);
         break;
       case 'Collector':
-        road = new CollectorRoad(startX, startY, endY, endX, roadLength, landUse, roadName, 0.009, 20);
+        road = new CollectorRoad(startX, startY, endY, endX, roadLength, landUse, roadName, direction, 0.009, 20);
         break;
       case 'Minor Arterial':
-        road = new MinorArterialRoad(startX, startY, endY, endX, roadLength, landUse, roadName, 0.02, 20);
+        road = new MinorArterialRoad(startX, startY, endY, endX, roadLength, landUse, roadName, direction, 0.02, 20);
         break;
       case 'Major Arterial':
-        road = new MajorArterialRoad(startX, startY, endY, endX, roadLength, landUse, roadName, 0.09, 10);
+        road = new MajorArterialRoad(startX, startY, endY, endX, roadLength, landUse, roadName, direction, 0.09, 10);
         break;
       case 'Major Arterial (Multilane)':
-        road = new MajorArterialMultilaneRoad(startX, startY, endY, endX, roadLength, landUse, roadName, 0.1, 20);
+        road = new MajorArterialMultilaneRoad(startX, startY, endY, endX, roadLength, landUse, roadName, direction, 0.1, 20);
         break;
       case 'Highway':
-        road = new HighwayRoad(startX, startY, endY, endX, roadLength, landUse, roadName, 0.2, 30);
+        road = new HighwayRoad(startX, startY, endY, endX, roadLength, landUse, roadName, direction, 0.2, 30);
         break;
     }
 
@@ -140,14 +142,22 @@ function drawLegend() {
   let legendX = windowWidth - legendWidth - padding; // X position of the legend on the right side
   let legendY = padding; // Y position of the legend at the top
 
-  // Draw the legend box
-  fill(0); // black fill color
+   // Draw the legend box
+   if (isDay) {
+    fill(0); // black fill color during the day
+  } else {
+    fill(255); // white fill color at night
+  }
   rect(legendX, legendY, legendWidth, legendHeight);
 
   // Legend title
   textAlign(LEFT, TOP);
   textSize(30);
-  fill(255); // white text color
+  if (isDay) {
+    fill(255); // White fill color during the day
+  } else {
+    fill(0); // Black fill color at night
+  }
   textFont("jost");
   text("LEGEND", legendX + padding, legendY + padding);
 
@@ -170,7 +180,11 @@ function drawLegend() {
       fill(color); // Use the road class color
       noStroke();
       rect(legendX + padding, itemY, 20, 20); // Draw a colored rectangle
-      fill(255); // Black text color
+      if (isDay) {
+        fill(255); // White fill color during the day
+      } else {
+        fill(0); // Black fill color at night
+      }
       textAlign(LEFT, CENTER);
       textSize(14);
       text(roadClass, legendX + padding + 25, itemY + 10); // Display the road class name
