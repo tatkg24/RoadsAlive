@@ -102,6 +102,7 @@ class BaseRoad {
 
             // Set initial opacity to 1 (fully visible)
             this.popup.style('opacity', '1');
+            soundEffect.play();
 
             // Gradually reduce opacity over time
             let fadeOutInterval = setInterval(() => {

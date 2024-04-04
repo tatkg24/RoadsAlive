@@ -4,10 +4,12 @@ let randStep;
 let roads = [];
 let trafficSlider; // Slider for controlling traffic density
 let isDay;
+let soundEffect;
 
 
 function preload(){
     table = loadTable('data/Road.csv', 'csv', 'header');
+    soundEffect = loadSound('assets/clickSound.wav');
 }
 
 function setup() {
