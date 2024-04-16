@@ -6,6 +6,7 @@ let roads = [];
 let trafficSlider; // Slider for controlling traffic density
 let isDay;
 let soundEffect;
+let refreshButton;
 
 // PRELOAD, SETUP, DRAW------------------------------------
 function preload(){
@@ -19,6 +20,9 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   trafficSlider = createSlider(0, 100, 50); // Traffic slider ranges from 0 to 100
   trafficSlider.id('day-night-slider'); //targetted in the css file
+  refreshButton = createButton("Generate New Roads");
+  refreshButton.id('refresh-button'); //targetted in the css file
+  refreshButton.id('refresh-button'); //targetted in the css file
   positionElements(); // Position elements based on window size
   drawRoads();
 }
@@ -51,7 +55,6 @@ function windowResized() {
   positionElements(); // Reposition elements based on new window size
   drawRoads(); // Ensure roads are redrawn after window resize
 }
-
 
 function positionElements() {
   // Position the slider
@@ -135,74 +138,76 @@ function drawRoads() {
   }
 }
 
-
 function mouseClicked() {
-  // Iterate over each road object and check for mouse click
-  roads.forEach(road => {
-    road.mouseClicked();
-  });
+  // Check if the mouse click is outside the legend area
+  const legendX = windowWidth - 210; // X position of the legend
+  const legendY = 10; // Y position of the legend
+  const legendWidth = 200; // Width of the legend box
+  const legendHeight = 295; // Height of the legend box
+  if (
+    mouseX < legendX ||
+    mouseX > legendX + legendWidth ||
+    mouseY < legendY ||
+    mouseY > legendY + legendHeight
+  ) {
+    // Iterate over each road object and check for mouse click
+    roads.forEach(road => {
+      road.mouseClicked();
+    });
+  }
 }
+
 
 function drawLegend() {
   noStroke();
-  let legendWidth = 200; // Width of the legend box
-  let legendHeight = 265; // Height of the legend box
-  let padding = 10; // Padding between legend items
+  const legendWidth = 200; // Width of the legend box
+  const legendHeight = 295; // Height of the legend box
+  const padding = 10; // Padding between legend items
 
-  let legendX = windowWidth - legendWidth - padding; // X position of the legend on the right side
-  let legendY = padding; // Y position of the legend at the top
+  const legendX = windowWidth - legendWidth - padding; // X position of the legend on the right side
+  const legendY = padding; // Y position of the legend at the top
 
-   // Draw the legend box
-   if (isDay) {
-    fill(0); // black fill color during the day
-  } else {
-    fill(255); // white fill color at night
-  }
+  // Draw the legend box
+  fill(isDay ? 0 : 255); // Black fill color during the day, white fill color at night
   rect(legendX, legendY, legendWidth, legendHeight);
 
   // Legend title
   textAlign(LEFT, TOP);
   textSize(30);
-  if (isDay) {
-    fill(255); // White fill color during the day (text)
-  } else {
-    fill(0); // Black fill color at night (text)
-  }
+  fill(isDay ? 255 : 0); // White fill color during the day (text), black fill color at night (text)
   textFont("jost");
   text("LEGEND", legendX + padding, legendY + padding);
 
-  // Legend items
-  let itemY = legendY + 40; // Starting Y position for legend items
-
   let roadColors = {
-      'Strata': color(223, 109, 38), // Orange color
-      'Local': color(0, 94, 223), // Blue color
-      'Collector': color(248, 188, 80), // Yellow color
-      'Minor Arterial': color(46, 76, 70), // Dark green color
-      'Major Arterial': color(85, 76, 158), // Purple color
-      'Major Arterial (Multilane)': color(218, 83, 99), // Red color
-      'Highway': color(10, 163, 175) // Cyan color
+    'Strata': color(223, 109, 38), // Orange color
+    'Local': color(0, 94, 223), // Blue color
+    'Collector': color(248, 188, 80), // Yellow color
+    'Minor Arterial': color(46, 76, 70), // Dark green color
+    'Major Arterial': color(85, 76, 158), // Purple color
+    'Major Arterial (Multilane)': color(218, 83, 99), // Red color
+    'Highway': color(10, 163, 175) // Cyan color
   };
 
-  // Loop through each road class and draw a legend item for it
-  Object.keys(roadColors).forEach((roadClass, index) => {
-      let color = roadColors[roadClass];
-      fill(color); // Use the road class color
-      noStroke();
-      rect(legendX + padding, itemY, 20, 20); // Draw a colored rectangle
-      if (isDay) {
-        fill(255); // White fill color during the day
-      } else {
-        fill(0); // Black fill color at night
-      }
-      textAlign(LEFT, CENTER);
-      textSize(14);
-      text(roadClass, legendX + padding + 25, itemY + 10); // Display the road class name
-      itemY += 25; // Move to the next Y position for the next legend item
+  // Legend items
+  let legendItemY = legendY + 40; // Starting Y position for legend items
+  Object.entries(roadColors).forEach(([roadClass, color], index) => {
+    fill(color); // Use the road class color
+    noStroke();
+    rect(legendX + padding, legendItemY, 20, 20); // Draw a colored rectangle
+    fill(isDay ? 255 : 0); // White fill color during the day, black fill color at night
+    textAlign(LEFT, CENTER);
+    textSize(14);
+    text(roadClass, legendX + padding + 25, legendItemY + 10); // Display the road class name
+    legendItemY += 25; // Move to the next Y position for the next legend item
   });
 
-  text("Switch from day to night", legendX + padding, itemY + padding)
+  // Switch from day to night text
+  text("Switch from day to night", legendX + padding, legendItemY + padding);
 
   // Move the slider inside the legend box
-  trafficSlider.position(legendX + padding, itemY + padding + 10);
+  trafficSlider.position(legendX + padding, legendItemY + padding + 10);
+
+  refreshButton.position(legendX + padding, legendItemY + padding + 35);
+  refreshButton.mouseClicked(drawRoads);
 }
+
