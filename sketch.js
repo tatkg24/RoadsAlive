@@ -1,3 +1,4 @@
+// VARIABLE DECLARATION------------------------------------
 let table;
 let step = 100;
 let randStep;
@@ -6,16 +7,18 @@ let trafficSlider; // Slider for controlling traffic density
 let isDay;
 let soundEffect;
 
-
+// PRELOAD, SETUP, DRAW------------------------------------
 function preload(){
+    // data table of roads 
     table = loadTable('data/Road.csv', 'csv', 'header');
+    //sound effect from the assets folder
     soundEffect = loadSound('assets/clickSound.wav');
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   trafficSlider = createSlider(0, 100, 50); // Traffic slider ranges from 0 to 100
-  trafficSlider.id('day-night-slider');
+  trafficSlider.id('day-night-slider'); //targetted in the css file
   positionElements(); // Position elements based on window size
   drawRoads();
 }
@@ -42,6 +45,7 @@ function draw() {
   drawLegend(); // Draw the legend
 }
 
+// FUNCTION DECLARATION--------------------------------------
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   positionElements(); // Reposition elements based on new window size
@@ -62,6 +66,7 @@ function positionElements() {
   drawLegend(legendX, legendY);
 }
 
+// function to return the maximum road length from the dataset
 function getRoadLength(){
     let maxRoadLength = 0;
     for (let i = 0; i < table.getRowCount(); i++) {
@@ -70,10 +75,12 @@ function getRoadLength(){
             maxRoadLength = roadLength;
         }
     }
+    console.log("MAX:" + maxRoadLength);
     return maxRoadLength;
 }
 
 // function to store and draw roads based on the table data
+// TODO fix line drawing so that roads are drawn accurately and to scale
 function drawRoads() {
   roads = [];
   let maxRoadLength = getRoadLength();
@@ -123,13 +130,14 @@ function drawRoads() {
         break;
     }
 
+    // add the road to the roads array
     roads.push(road);
   }
 }
 
 
 function mouseClicked() {
-  // Iterate over each road object and check for mouse over
+  // Iterate over each road object and check for mouse click
   roads.forEach(road => {
     road.mouseClicked();
   });
@@ -156,9 +164,9 @@ function drawLegend() {
   textAlign(LEFT, TOP);
   textSize(30);
   if (isDay) {
-    fill(255); // White fill color during the day
+    fill(255); // White fill color during the day (text)
   } else {
-    fill(0); // Black fill color at night
+    fill(0); // Black fill color at night (text)
   }
   textFont("jost");
   text("LEGEND", legendX + padding, legendY + padding);

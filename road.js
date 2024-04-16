@@ -17,8 +17,8 @@ class BaseRoad {
         this.popupShown = false;
         this.t = 0; //time variable for the animation
         this.speed = speed; //speed variable for the animation
-        this.defaultAmp = amp;
-        this.currentAmp = amp;
+        this.defaultAmp = amp; //default amplitude
+        this.currentAmp = amp; //current amplitude
     }
 
    // controls the animation pacing
@@ -73,6 +73,8 @@ class BaseRoad {
     }
     
 
+    // creates the info box for the road on mouseclick
+    // TODO: improve accuracy based on vertical translation
     mouseClicked() {
         // Calculate a point along the curve that is closer to the mouse position
         let closestPoint = this.findClosestPointOnCurve(mouseX, mouseY);
@@ -119,6 +121,7 @@ class BaseRoad {
         }
     }
 
+    // determines the closest point on the curve
     findClosestPointOnCurve(x, y) {
         let closestDist = Infinity;
         let closestPoint;
@@ -138,12 +141,8 @@ class BaseRoad {
             }
         }
         return closestPoint;
-    }
-    
-    
-    
-    
-}
+    } 
+}//end baseRoad class
 
 // Define subclasses for each road class----------------------------------------------------------------
 
