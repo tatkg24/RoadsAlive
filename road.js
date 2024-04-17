@@ -125,7 +125,7 @@ class BaseRoad {
     findClosestPointOnCurve(x, y) {
         let closestDist = Infinity;
         let closestPoint;
-        let stepSize = 0.001; // Smaller step size for higher accuracy
+        let stepSize = 0.0001; // Smaller step size for higher accuracy
         for (let t = 0; t <= 1; t += stepSize) {
             let currentX = lerp(this.startX, this.endX, t);
             let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.currentAmp;
@@ -133,6 +133,9 @@ class BaseRoad {
             if (this.direction === 'NS') {
                 currentY = lerp(this.startY, this.endY, t);
                 currentX = this.startX + sin((currentY + frameCount) * this.speed) * this.currentAmp;
+            }else{
+                currentX = lerp(this.startX, this.endX, t);
+                currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.currentAmp;
             }
     
             let d = dist(currentX, currentY, x, y);
@@ -143,6 +146,7 @@ class BaseRoad {
         }
         return closestPoint;
     }
+    
     
 }//end baseRoad class
 
