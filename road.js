@@ -125,7 +125,8 @@ class BaseRoad {
     findClosestPointOnCurve(x, y) {
         let closestDist = Infinity;
         let closestPoint;
-        for (let t = 0; t <= 1; t += 0.01) {
+        let stepSize = 0.001; // Smaller step size for higher accuracy
+        for (let t = 0; t <= 1; t += stepSize) {
             let currentX = lerp(this.startX, this.endX, t);
             let currentY = this.startY + sin((currentX + frameCount) * this.speed) * this.currentAmp;
     
@@ -141,7 +142,8 @@ class BaseRoad {
             }
         }
         return closestPoint;
-    } 
+    }
+    
 }//end baseRoad class
 
 // Define subclasses for each road class----------------------------------------------------------------

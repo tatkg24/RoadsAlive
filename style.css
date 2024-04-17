@@ -27,6 +27,10 @@ canvas {
   -webkit-appearance: none;
 }
 
+#day-night-slider::-webkit-slider-thumb:hover{
+  background: #005EDF;
+}
+
 #refresh-button{
   background-color: #0AA3AF;
   border: none;
@@ -34,5 +38,23 @@ canvas {
   color:#FFf;
   padding: 0.25em;
   width: 175px;
+}
+
+#refresh-button:hover{
+  background-color: #DA5363;
+}
+
+#hide-legend{
+  background-color: #0AA3AF;
+  border: none;
+  border-radius: 5px;
+  color:#FFf;
+  padding: 0.25em;
+  width: 20px;
+}
+
+#hide-legend:hover{
+  background-color: #DA5363;
+
 }
 
